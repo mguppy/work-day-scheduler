@@ -9,22 +9,60 @@ window.onload = function() {
 //Display today's date
 var today = moment();
 $("#currentDay").text(today.format("dddd, MMM Do, YYYY"));
+initializeAllRows();
+}
 
 //Color code blocks based on time of day
 var current_timeHour = moment().format("HH");
+current_timeHour = parseInt(current_timeHour);
 console.log(current_timeHour)
-
-var hourString = document.getElementById("hour").innerText;
-var hourHTML = hourString.split(' ') [0];
-console.log(hourHTML)
 
 //if current time div hour is less than current time hour, gray out boxes
 //current time is greater than now, make boxes green
 //current time is within hour block, make box red
-if(current_timeHour<hourHTML) {
-    document.getElementById("hour").style.backgroundColor = "gray";
+function initializeAllRows() {
+
+var hourStringArr = document.getElementsByClassName("hour");
+var buttonArr = document.getElementsByClassName("removeButtonClass");
+var userEventClassArr = document.getElementsByClassName("userEventClass");
+
+for (var i = 0; i < hourStringArr.length; i++) {
+    var hourHTML = hourStringArr[i].innerText.split(":") [0];
+    hourHTML = parseInt(hourHTML);
+    console.log(hourHTML);
+
+    if(current_timeHour>hourHTML) {
+        document.getElementsByClassName("color-change")[i].style.backgroundColor = "gray";
+    }
+    else if(current_timeHour === hourHTML) {
+        document.getElementsByClassName("color-change")[i].style.backgroundColor = "red";
+    }
+    else {
+        document.getElementsByClassName("color-change")[i].style.backgroundColor = "green";
+    }
+        //Setup remove event on button click
+        buttonArr[i].addEventListener("click", removeClick, false);
+        buttonArr[i].myParam = userEventClassArr[i];
+
+        //Get local storage for textboxes based on hour on page load or refresh
+        userEventClassArr[i].value = window.localStorage.getItem(hourStringArr[i].innerText.trim());
+    }
+
 }
-else {
-    document.getElementById("hour").style.backgroundColor = "green";
+
+//Clears local storage for the row of the button click and removes textbox value
+function removeClick(event) {
+    var inputbox = event.currentTarget.myParam;
+    var hour = inputbox.parentElement.parentElement.firstElementChild.innerText.trim();
+    inputbox.value = " ";
+    localStorage.removeItem(hour);
 }
+
+//Add event to local storage
+function onTextChange(inputbox) {
+    var inputValue = inputbox.value;
+    var hour = inputbox.parentElement.parentElement.firstElementChild.innerText.trim();
+    window.localStorage.setItem(hour,inputValue);
+    console.log(hour + " " + inputValue);
 }
+
